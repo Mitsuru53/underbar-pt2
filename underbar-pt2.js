@@ -21,12 +21,31 @@ const { each } = require('./underbar-pt1');
 const extend = function(obj) {
   // Your code here
   // Hint: remember that Array.from can convert an array-like object to handy-dandy array for you.
+  var destination = {};
+  for (var i = 0; i < arguments.length; i++) {
+    for (key in arguments[i]) {
+      destination[key] = arguments[i][key]
+    }
+  }
+  return destination;
 };
 
 // Like extend, but doesn't ever overwrite a key that already
 // exists in obj
 const defaults = function(obj) {
   // Your code here
+  var destination;
+  for (var i = 0; i < arguments.length; i++) {
+    if (destination === undefined) {
+      destination = arguments[i];
+    }
+    for (key in arguments[i]) {
+      if (!destination.hasOwnProperty(key)) {
+        destination[key] = arguments[i][key]
+      }
+    }
+  }
+  return destination;
 };
 
 
@@ -42,6 +61,15 @@ const defaults = function(obj) {
 // should return the previously returned value.
 const once = function(func) {
   // Hint: you're going to need to return another function that you create inside this function.
+  var called = false;
+  var result = function(){};
+  return function() {
+    if(!called){
+      result = func.apply(this, arguments);
+      called = true;
+    }
+    return result;
+  }
 };
 
 // Memorize an expensive function's results by storing them. You may assume
@@ -55,6 +83,16 @@ const once = function(func) {
 const memoize = function(func) {
   // Hint: look up Function.apply
   // Your code here
+  const memoizedFunc = function() {
+    const cache = memoizedFunc.cache;
+    const key = JSON.stringify(arguments);
+    if (!cache[key]) {
+      cache[key] = func.apply(this, arguments);
+    }
+    return cache[key];
+  };
+  memoizedFunc.cache = {};
+  return memoizedFunc;
 };
 
 // Delays a function for the given number of milliseconds, and then calls
@@ -66,6 +104,10 @@ const memoize = function(func) {
 const delay = function(func, wait) {
   // Hint: delay things with the global function setTimeout()
   // Hint: look up Function.apply
+  var args = Array.from(arguments).slice(2);
+  return setTimeout(function(){
+    return func.apply(null, args);
+  }, wait)
 };
 
 // Randomizes the order of an array's contents.
@@ -74,6 +116,15 @@ const delay = function(func, wait) {
 // input array. For a tip on how to make a copy of an array, see:
 // http://mdn.io/Array.prototype.slice
 const shuffle = function(arr) {
+  var copyArr = arr.slice();
+  var num = arr.length;
+  while (num) {
+    var i = Math.floor(Math.random() * num);
+    var str = copyArr[--num];
+    copyArr[num] = copyArr[i];
+    copyArr[i] = str;
+  }
+  return copyArr;
   // Hint: See http://bost.ocks.org/mike/shuffle/ for an in-depth explanation of the
   // Fisher-Yates Shuffle
 };
